@@ -1,0 +1,82 @@
+# Golang
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+go.sum
+*.db
+*.sqlite
+*.sqlite3
+
+# TypeScript/Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist/
+build/
+.env
+.env.local
+.env.*.local
+*.log
+.DS_Store
+coverage/
+.nyc_output/
+.npm/
+.eslintcache
+.prettiercache
+
+# Java
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+*.class
+*.jar
+*.war
+*.ear
+*.logs
+*.iml
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+.settings/
+.project
+.classpath
+.factorypath
+.springBeans
+.sts4-cache
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Docker
+.docker/
+docker-compose.override.yml
+
+# Security testing results
+security_test_results_*.log
+zap/
+nikto/
+*.db
+*.sqlite
+*.sqlite3
+
+# Grafana
+grafana/data/
+grafana/logs/
+grafana/plugins/
+
+# System Files
+.DS_Store
+Thumbs.db 
