@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IEEE Figure: Security Paradigm Comparison</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.1.0/dist/chartjs-plugin-annotation.min.js"></script>
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: white;
+            color: black;
+        }
+        .chart-container {
+            width: 680px;
+            height: 380px;
+            margin: 20px auto;
+            background-color: white;
+            padding: 10px;
+            border: 1px solid #eee;
+        }
+        h1 {
+            color: #193C7D;
+            text-align: center;
+            font-size: 14pt;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .fig-number {
+            font-style: italic;
+            font-size: 11pt;
+            margin-top: 0;
+            text-align: center;
+        }
+        .export-btn {
+            margin-top: 20px;
+            padding: 8px 16px;
+            background-color: #f5f5f5;
+            border: 1px solid #5487AC;
+            cursor: pointer;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 10pt;
+            color: #193C7D;
+        }
+        .export-btn:hover {
+            background-color: #e6eef3;
+        }
+        .legend {
+            margin-top: 10px;
+            font-size: 11pt;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Security Paradigm Comparison</h1>
+    <p class="fig-number">Fig. 6. Comparison of security paradigms across programming languages.</p>
+    <div class="chart-container">
+        <canvas id="paradigmChart"></canvas>
+    </div>
+    <button class="export-btn" onclick="exportToImage()">Export As PNG</button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('paradigmChart').getContext('2d');
+            
+            // Custom scatter plot for paradigm positioning
+            const paradigmChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        {
+                            label: 'Java',
+                            data: [{x: 25, y: 85}],
+                            backgroundColor: 'rgba(25, 60, 125, 0.9)',
+                            borderColor: 'rgba(25, 60, 125, 1)',
+                            borderWidth: 2,
+                            pointRadius: 10,
+                            pointHoverRadius: 12
+                        },
+                        {
+                            label: 'TypeScript',
+                            data: [{x: 50, y: 60}],
+                            backgroundColor: 'rgba(84, 135, 172, 0.9)',
+                            borderColor: 'rgba(84, 135, 172, 1)',
+                            borderWidth: 2,
+                            pointRadius: 10,
+                            pointHoverRadius: 12
+                        },
+                        {
+                            label: 'Golang',
+                            data: [{x: 80, y: 35}],
+                            backgroundColor: 'rgba(162, 184, 194, 0.9)',
+                            borderColor: 'rgba(162, 184, 194, 1)',
+                            borderWidth: 2,
+                            pointRadius: 10,
+                            pointHoverRadius: 12
+                        }
+                    ]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            min: 0,
+                            max: 100,
+                            ticks: {
+                                display: false
+                            },
+                            grid: {
+                                display: false
+                            },
+                            border: {
+                                display: true,
+                                width: 1,
+                                color: 'black'
+                            }
+                        },
+                        y: {
+                            min: 0,
+                            max: 100,
+                            position: 'left',
+                            ticks: {
+                                callback: function(value) {
+                                    if (value === 0) return 'Low';
+                                    if (value === 100) return 'High';
+                                    return '';
+                                },
+                                font: {
+                                    family: "'Times New Roman', Times, serif",
+                                    size: 12
+                                },
+                                color: 'black'
+                            },
+                            grid: {
+                                display: false
+                            },
+                            border: {
+                                display: true,
+                                width: 1,
+                                color: 'black'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Security Level',
+                                font: {
+                                    family: "'Times New Roman', Times, serif",
+                                    size: 12,
+                                    weight: 'normal'
+                                },
+                                color: 'black'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    family: "'Times New Roman', Times, serif",
+                                    size: 10
+                                },
+                                color: 'black',
+                                boxWidth: 15
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const language = context.dataset.label;
+                                    
+                                    if (language === 'Java') {
+                                        return 'Java: Secure by default, minimal configuration needed';
+                                    } else if (language === 'TypeScript') {
+                                        return 'TypeScript: Balanced security requiring moderate configuration';
+                                    } else if (language === 'Golang') {
+                                        return 'Golang: Security through explicitness, significant manual implementation';
+                                    }
+                                }
+                            },
+                            bodyFont: {
+                                family: "'Times New Roman', Times, serif",
+                                size: 10
+                            }
+                        },
+                        annotation: {
+                            annotations: {
+                                xAxisLabel1: {
+                                    type: 'label',
+                                    xValue: 0,
+                                    yValue: -10,
+                                    content: ['Default Security'],
+                                    font: {
+                                        family: "'Times New Roman', Times, serif",
+                                        size: 12
+                                    },
+                                    color: 'black'
+                                },
+                                xAxisLabel2: {
+                                    type: 'label',
+                                    xValue: 100,
+                                    yValue: -10,
+                                    content: ['Manual Config'],
+                                    font: {
+                                        family: "'Times New Roman', Times, serif",
+                                        size: 12
+                                    },
+                                    color: 'black'
+                                },
+                                xAxisArrow: {
+                                    type: 'line',
+                                    xMin: 5,
+                                    xMax: 95,
+                                    yMin: -10,
+                                    yMax: -10,
+                                    borderColor: 'black',
+                                    borderWidth: 1,
+                                    borderDash: [0, 0],
+                                    label: {
+                                        display: true,
+                                        content: '◄────────────────────────────────────────►',
+                                        position: 'start',
+                                        font: {
+                                            family: "'Times New Roman', Times, serif",
+                                            size: 14
+                                        },
+                                        color: 'black'
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        });
+
+        function exportToImage() {
+            const canvas = document.getElementById('paradigmChart');
+            const image = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = 'security_paradigm_comparison.png';
+            link.href = image;
+            link.click();
+        }
+    </script>
+</body>
+</html> 

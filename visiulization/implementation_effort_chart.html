@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IEEE Figure: Security Implementation Effort</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: white;
+            color: black;
+        }
+        .chart-container {
+            width: 680px;
+            height: 350px;
+            margin: 20px auto;
+            background-color: white;
+            padding: 10px;
+            border: 1px solid #eee;
+        }
+        h1 {
+            color: black;
+            text-align: center;
+            font-size: 14pt;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .fig-number {
+            font-style: italic;
+            font-size: 11pt;
+            margin-top: 0;
+            text-align: center;
+        }
+        .export-btn {
+            margin-top: 20px;
+            padding: 8px 16px;
+            background-color: #eee;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 10pt;
+        }
+    </style>
+</head>
+<body>
+    <h1>Security Implementation Effort</h1>
+    <p class="fig-number">Fig. 2. Comparison of lines of code required for implementing security features.</p>
+    <div class="chart-container">
+        <canvas id="barChart"></canvas>
+    </div>
+    <button class="export-btn" onclick="exportToImage()">Export As PNG</button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('barChart').getContext('2d');
+            
+            const barChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Java', 'TypeScript', 'Golang'],
+                    datasets: [{
+                        label: 'Lines of Security-Specific Code',
+                        data: [126, 164, 315],
+                        backgroundColor: [
+                            'rgba(25, 60, 125, 0.9)',
+                            'rgba(84, 135, 172, 0.9)',
+                            'rgba(162, 184, 194, 0.9)'
+                        ],
+                        borderColor: [
+                            'rgba(25, 60, 125, 1)',
+                            'rgba(84, 135, 172, 1)',
+                            'rgba(162, 184, 194, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Lines of Code',
+                                font: {
+                                    family: "'Times New Roman', Times, serif",
+                                    size: 12,
+                                    weight: 'normal'
+                                },
+                                color: 'black'
+                            },
+                            max: 400,
+                            ticks: {
+                                font: {
+                                    family: "'Times New Roman', Times, serif",
+                                    size: 10
+                                },
+                                color: 'black'
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                font: {
+                                    family: "'Times New Roman', Times, serif",
+                                    size: 10
+                                },
+                                color: 'black'
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.raw + ' lines';
+                                },
+                                afterLabel: function(context) {
+                                    const language = context.label;
+                                    
+                                    if (language === 'Java') {
+                                        return 'Baseline: 1× Java effort';
+                                    } else if (language === 'TypeScript') {
+                                        return '1.3× more code than Java';
+                                    } else if (language === 'Golang') {
+                                        return '2.5× more code than Java';
+                                    }
+                                }
+                            },
+                            bodyFont: {
+                                family: "'Times New Roman', Times, serif",
+                                size: 10
+                            }
+                        }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        });
+
+        function exportToImage() {
+            const canvas = document.getElementById('barChart');
+            const image = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = 'security_implementation_effort.png';
+            link.href = image;
+            link.click();
+        }
+    </script>
+</body>
+</html> 

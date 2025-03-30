@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IEEE Figure: Security-Related Code Distribution</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: white;
+            color: black;
+        }
+        .chart-container {
+            width: 680px;
+            height: 350px;
+            margin: 20px auto;
+            background-color: white;
+            padding: 10px;
+            border: 1px solid #eee;
+        }
+        h1 {
+            color: #193C7D;
+            text-align: center;
+            font-size: 14pt;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .fig-number {
+            font-style: italic;
+            font-size: 11pt;
+            margin-top: 0;
+            text-align: center;
+        }
+        .export-btn {
+            margin-top: 20px;
+            padding: 8px 16px;
+            background-color: #f5f5f5;
+            border: 1px solid #5487AC;
+            cursor: pointer;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 10pt;
+            color: #193C7D;
+        }
+        .export-btn:hover {
+            background-color: #e6eef3;
+        }
+        .legend {
+            margin-top: 10px;
+            font-size: 11pt;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Security-Related Code Distribution</h1>
+    <p class="fig-number">Fig. 4. Distribution of security code across framework, configuration, and custom components.</p>
+    <div class="chart-container">
+        <canvas id="distributionChart"></canvas>
+    </div>
+    <div class="legend">
+        <p>Distribution shows percentage of security code in each category</p>
+    </div>
+    <button class="export-btn" onclick="exportToImage()">Export As PNG</button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('distributionChart').getContext('2d');
+            
+            const distributionChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Java', 'TypeScript', 'Golang'],
+                    datasets: [
+                        {
+                            label: 'Framework',
+                            data: [70, 40, 20],
+                            backgroundColor: 'rgba(25, 60, 125, 0.8)',
+                            borderColor: 'rgba(25, 60, 125, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Configuration',
+                            data: [20, 40, 30],
+                            backgroundColor: 'rgba(84, 135, 172, 0.8)',
+                            borderColor: 'rgba(84, 135, 172, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Custom Implementation',
+                            data: [10, 20, 50],
+                            backgroundColor: 'rgba(162, 184, 194, 0.8)',
+                            borderColor: 'rgba(162, 184, 194, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            stacked: true,
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Percentage of Security Code (%)',
+                                font: {
+                                    family: "'Times New Roman', Times, serif",
+                                    size: 12,
+                                    weight: 'normal'
+                                },
+                                color: 'black'
+                            },
+                            ticks: {
+                                font: {
+                                    family: "'Times New Roman', Times, serif",
+                                    size: 10
+                                },
+                                color: 'black',
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        },
+                        y: {
+                            stacked: true,
+                            ticks: {
+                                font: {
+                                    family: "'Times New Roman', Times, serif",
+                                    size: 10
+                                },
+                                color: 'black'
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    family: "'Times New Roman', Times, serif",
+                                    size: 10
+                                },
+                                color: 'black',
+                                boxWidth: 15
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.x + '%';
+                                },
+                                afterBody: function(context) {
+                                    const index = context[0].dataIndex;
+                                    const language = context[0].label;
+                                    
+                                    if (language === 'Java') {
+                                        return 'Java relies heavily on framework defaults with minimal custom code';
+                                    } else if (language === 'TypeScript') {
+                                        return 'TypeScript balances framework and configuration needs';
+                                    } else if (language === 'Golang') {
+                                        return 'Golang requires significant custom implementation';
+                                    }
+                                }
+                            },
+                            bodyFont: {
+                                family: "'Times New Roman', Times, serif",
+                                size: 10
+                            }
+                        }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        });
+
+        function exportToImage() {
+            const canvas = document.getElementById('distributionChart');
+            const image = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = 'security_code_distribution.png';
+            link.href = image;
+            link.click();
+        }
+    </script>
+</body>
+</html> 

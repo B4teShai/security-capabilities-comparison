@@ -15,6 +15,7 @@ This project demonstrates security features in three different programming langu
 - Node.js 18 or later
 - Java 17 or later
 - Maven
+- Modern web browser (for visualizations)
 
 ## Running the Applications
 
@@ -47,6 +48,28 @@ mvn spring-boot:run
 ```
 
 The application will run on http://localhost:8080
+
+## Visualizations
+
+The project includes interactive visualizations of the security comparison data. These are provided as standalone HTML files in the `visiulization` directory.
+
+### Viewing the Visualizations
+
+Simply open the `visiulization/index.html` file in your web browser to view all charts:
+
+```bash
+open visiulization/index.html
+```
+
+### Available Visualizations
+
+1. **Security Capabilities Radar Chart** - Comparison of security capabilities across nine critical domains
+2. **Security Implementation Effort** - Lines of security-specific code required in each language
+3. **Security Code Distribution** - Distribution of security code across framework, configuration, and custom components
+4. **Security Paradigm Comparison** - Comparison of security paradigms from "secure by default" to "security through explicitness"
+5. **Security Maturity Model** - Proposed security maturity model showing positioning of each language
+
+Each visualization can be exported as a PNG file for inclusion in publications or presentations.
 
 ## Testing the Applications
 
