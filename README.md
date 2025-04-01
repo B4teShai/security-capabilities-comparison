@@ -1,202 +1,133 @@
 # Security Capabilities Comparison
 
-This project demonstrates security features in three different programming languages: Golang, TypeScript, and Java. Each implementation includes:
+This project compares security implementations across three different programming languages: Golang, TypeScript (Node.js), and Java (Spring Boot). The goal is to analyze and compare how each language/framework handles various security concerns in web applications.
 
-- User registration and login
-- Password hashing
-- JWT-based authentication
-- Protected endpoints
-- Input validation
-- SQL injection prevention
+## Project Structure
 
-## Prerequisites
-
-- Go 1.21 or later
-- Node.js 18 or later
-- Java 17 or later
-- Maven
-- Modern web browser (for visualizations)
-
-## Running the Applications
-
-### Golang Application
-
-```bash
-cd golang
-go mod tidy
-go run main.go
+```
+.
+├── golang/           # Golang implementation
+├── typescript/       # TypeScript (Node.js) implementation
+├── java/            # Java Spring Boot implementation
+├── grafana/         # Security metrics dashboard
+└── docker-compose.yml
 ```
 
-The application will run on http://localhost:8080
+## Features Compared
 
-### TypeScript Application
+1. **Input Validation & Sanitization**
+   - Golang: Manual validation with custom functions
+   - TypeScript: Zod schema validation
+   - Java: Bean Validation (JSR 380)
 
-```bash
-cd typescript
-npm install
-npx prisma generate
-npm run dev
-```
+2. **SQL Injection Protection**
+   - Golang: Parameterized queries with `database/sql`
+   - TypeScript: Prisma ORM with built-in protection
+   - Java: JPA/Hibernate with prepared statements
 
-The application will run on http://localhost:3000
+3. **JWT Token Security**
+   - Golang: `dgrijalva/jwt-go` package
+   - TypeScript: `jsonwebtoken` package
+   - Java: Spring Security JWT
 
-### Java Application
+4. **Security Headers**
+   - Golang: Manual header setting
+   - TypeScript: Helmet middleware
+   - Java: Spring Security headers
 
-```bash
-cd java
-mvn spring-boot:run
-```
+5. **Error Handling & Information Disclosure**
+   - Golang: Custom error types
+   - TypeScript: Error middleware
+   - Java: Global exception handler
 
-The application will run on http://localhost:8080
+6. **CSRF Protection**
+   - Golang: Custom CSRF middleware
+   - TypeScript: CSRF tokens
+   - Java: Spring Security CSRF
 
-## Visualizations
+7. **Rate Limiting**
+   - Golang: Rate limiter middleware
+   - TypeScript: Express rate limit
+   - Java: Bucket4j implementation
 
-The project includes interactive visualizations of the security comparison data. These are provided as standalone HTML files in the `visiulization` directory.
+8. **Dependency Security**
+   - Golang: Go modules
+   - TypeScript: npm audit
+   - Java: Maven dependencies
 
-### Viewing the Visualizations
+## Getting Started
 
-Simply open the `visiulization/index.html` file in your web browser to view all charts:
+### Prerequisites
 
-```bash
-open visiulization/index.html
-```
+- Docker and Docker Compose
+- Make (optional, for convenience)
 
-### Available Visualizations
+### Running the Services
 
-1. **Security Capabilities Radar Chart** - Comparison of security capabilities across nine critical domains
-2. **Security Implementation Effort** - Lines of security-specific code required in each language
-3. **Security Code Distribution** - Distribution of security code across framework, configuration, and custom components
-4. **Security Paradigm Comparison** - Comparison of security paradigms from "secure by default" to "security through explicitness"
-5. **Security Maturity Model** - Proposed security maturity model showing positioning of each language
+1. Start all services:
+   ```bash
+   docker-compose up -d
+   ```
 
-Each visualization can be exported as a PNG file for inclusion in publications or presentations.
+2. Services will be available at:
+   - Golang: http://localhost:8080
+   - TypeScript: http://localhost:3000
+   - Java: http://localhost:8081
+   - Security Dashboard: http://localhost:3001
+   - OWASP Juice Shop (for testing): http://localhost:3002
 
-## Testing the Applications
+### Running Security Tests
 
-### 1. Register a new user
-
-```bash
-# Golang
-curl -X POST http://localhost:8080/register \
-  -H "Content-Type: application/json" \
-  -d '{"username": "testuser", "password": "password123"}'
-
-# TypeScript
-curl -X POST http://localhost:3000/register \
-  -H "Content-Type: application/json" \
-  -d '{"username": "testuser", "password": "password123"}'
-
-# Java
-curl -X POST http://localhost:8080/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"username": "testuser", "password": "password123"}'
-```
-
-### 2. Login
-
-```bash
-# Golang
-curl -X POST http://localhost:8080/login \
-  -H "Content-Type: application/json" \
-  -d '{"username": "testuser", "password": "password123"}'
-
-# TypeScript
-curl -X POST http://localhost:3000/login \
-  -H "Content-Type: application/json" \
-  -d '{"username": "testuser", "password": "password123"}'
-
-# Java
-curl -X POST http://localhost:8080/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"username": "testuser", "password": "password123"}'
-```
-
-### 3. Access Protected Endpoint
+The project includes a comprehensive security test script:
 
 ```bash
-# Golang
-curl -X GET http://localhost:8080/protected \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN"
-
-# TypeScript
-curl -X GET http://localhost:3000/protected \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN"
-
-# Java
-curl -X GET http://localhost:8080/api/protected \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+./comparative_security_test.sh
 ```
 
-## Security Features Comparison
+This script performs automated security testing across all three implementations and generates a detailed report.
 
-### Golang
-- Strong type system
-- Built-in concurrency safety
-- Explicit error handling
-- Memory safety through garbage collection
-- Standard library security features
+## Security Dashboard
 
-### TypeScript
-- Static type checking
-- Interface-based type safety
-- Null safety through strict null checks
-- Type inference
-- Integration with JavaScript security features
+The project includes a Grafana dashboard for visualizing security metrics:
 
-### Java
-- Strong type system
-- Exception handling
-- Memory management
-- Security manager
-- Rich security libraries
-- Built-in cryptography support
+1. Access the dashboard at http://localhost:3001
+2. Login with:
+   - Username: admin
+   - Password: admin
+3. Navigate to the "Security Comparison" dashboard
 
-## Security Testing
+## API Endpoints
 
-To test security vulnerabilities, you can try:
+Each service implements the following endpoints:
 
-1. SQL Injection attempts
-2. XSS attacks
-3. CSRF attacks
-4. Buffer overflow attempts
-5. Input validation bypass attempts
+- `GET /health` - Health check endpoint
+- `POST /register` - User registration
+- `POST /login` - User authentication
+- `GET /protected` - Protected endpoint (requires JWT)
 
-## Test Results
+## Security Considerations
 
-### Security Vulnerability Tests
+- JWT secrets should be properly configured in production
+- Database credentials should be secured
+- HTTPS should be enabled in production
+- Rate limiting should be adjusted based on requirements
+- Security headers should be reviewed and customized
 
-| Test Type | Golang | TypeScript | Java |
-|-----------|--------|------------|------|
-| SQL Injection | Prevented | Prevented | Prevented |
-| XSS Attack | Prevented | Vulnerable in some cases | Prevented |
-| CSRF Attack | Vulnerable without additional middleware | Prevented with proper configuration | Prevented |
-| Buffer Overflow | Protected (managed language) | Protected (managed language) | Protected (managed language) |
-| Input Validation | Strong validation | Good validation | Strong validation with bean validation |
+## Contributing
 
-### Performance Tests
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
 
-| Metric | Golang | TypeScript | Java |
-|--------|--------|------------|------|
-| Requests/sec | 8,245 | 3,120 | 4,580 |
-| Avg Latency | 6ms | 15ms | 12ms |
-| Memory Usage | 24MB | 86MB | 210MB |
-| CPU Usage | Low | Medium | Medium-High |
+## License
 
-### Security Implementation Effort
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-| Feature | Golang | TypeScript | Java |
-|---------|--------|------------|------|
-| Authentication | Medium | Easy with libraries | Easy with Spring Security |
-| Input Validation | Medium | Easy with libraries | Easy with annotations |
-| SQL Safety | Easy with prepared statements | Easy with ORM | Easy with JPA |
-| JWT Implementation | Manual implementation required | Good library support | Excellent library support |
+## Acknowledgments
 
-Note: These applications are for demonstration purposes only. In a production environment, you should:
-
-1. Use environment variables for sensitive data
-2. Implement rate limiting
-3. Use HTTPS
-4. Implement proper session management
-5. Use secure password policies
-6. Implement proper logging and monitoring
-7. Regular security audits and updates 
+- OWASP Security Guidelines
+- Spring Security Documentation
+- Express.js Security Best Practices
+- Golang Security Guidelines 
