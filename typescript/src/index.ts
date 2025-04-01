@@ -10,6 +10,11 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'; // In production
 
 app.use(express.json());
 
+// Health check endpoint
+app.get('/health', (req: express.Request, res: express.Response) => {
+  res.status(200).json({ status: 'healthy' });
+});
+
 // Input validation schemas
 const UserSchema = z.object({
   username: z.string().min(3).max(50),

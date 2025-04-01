@@ -48,6 +48,7 @@ func main() {
 	}
 
 	r := mux.NewRouter()
+	r.HandleFunc("/health", healthCheckHandler).Methods("GET")
 	r.HandleFunc("/register", registerHandler).Methods("POST")
 	r.HandleFunc("/login", loginHandler).Methods("POST")
 	r.HandleFunc("/protected", authMiddleware(protectedHandler)).Methods("GET")
@@ -140,4 +141,9 @@ func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
 
 func protectedHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Protected endpoint accessed successfully!"))
+}
+
+func healthCheckHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Service is healthy"))
 }
