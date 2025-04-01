@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="mn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IEEE Figure: Security-Related Code Distribution</title>
+    <title>IEEE Зураг: Аюулгүй байдлын кодын тархалт</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
@@ -58,15 +58,15 @@
     </style>
 </head>
 <body>
-    <h1>Security-Related Code Distribution</h1>
-    <p class="fig-number">Fig. 4. Distribution of security code across framework, configuration, and custom components.</p>
+    <h1>Аюулгүй байдлын кодын тархалт</h1>
+    <p class="fig-number">Зураг 4. Framework, тохиргоо болон өөрөө хийсэн компонентуудын аюулгүй байдлын кодын тархалт.</p>
     <div class="chart-container">
         <canvas id="distributionChart"></canvas>
     </div>
     <div class="legend">
-        <p>Distribution shows percentage of security code in each category</p>
+        <p>Тархалт нь ангилал бүрт аюулгүй байдлын кодын хувийг харуулна</p>
     </div>
-    <button class="export-btn" onclick="exportToImage()">Export As PNG</button>
+    <button class="export-btn" onclick="exportToImage()">PNG болгон экспортлох</button>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -85,14 +85,14 @@
                             borderWidth: 1
                         },
                         {
-                            label: 'Configuration',
+                            label: 'Тохиргоо',
                             data: [20, 40, 30],
                             backgroundColor: 'rgba(84, 135, 172, 0.8)',
                             borderColor: 'rgba(84, 135, 172, 1)',
                             borderWidth: 1
                         },
                         {
-                            label: 'Custom Implementation',
+                            label: 'Өөрөө хийсэн хэрэгжүүлэлт',
                             data: [10, 20, 50],
                             backgroundColor: 'rgba(162, 184, 194, 0.8)',
                             borderColor: 'rgba(162, 184, 194, 1)',
@@ -109,7 +109,7 @@
                             max: 100,
                             title: {
                                 display: true,
-                                text: 'Percentage of Security Code (%)',
+                                text: 'Аюулгүй байдлын кодын хувь (%)',
                                 font: {
                                     family: "'Times New Roman', Times, serif",
                                     size: 12,
@@ -167,11 +167,11 @@
                                     const language = context[0].label;
                                     
                                     if (language === 'Java') {
-                                        return 'Java relies heavily on framework defaults with minimal custom code';
+                                        return 'Java нь framework-ийн анхны тохиргоонд ихээхэн найдаж, хамгийн бага өөрөө хийсэн кодтой';
                                     } else if (language === 'TypeScript') {
-                                        return 'TypeScript balances framework and configuration needs';
+                                        return 'TypeScript нь framework болон тохиргооны хэрэгцээг тэнцвэржүүлдэг';
                                     } else if (language === 'Golang') {
-                                        return 'Golang requires significant custom implementation';
+                                        return 'Golang нь их хэмжээний өөрөө хийсэн хэрэгжүүлэлт шаарддаг';
                                     }
                                 }
                             },

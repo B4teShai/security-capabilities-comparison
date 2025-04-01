@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="mn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IEEE Figure: Security Paradigm Comparison</title>
+    <title>IEEE Зураг: Аюулгүй байдлын парадигмын харьцуулалт</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.1.0/dist/chartjs-plugin-annotation.min.js"></script>
     <style>
@@ -59,12 +59,12 @@
     </style>
 </head>
 <body>
-    <h1>Security Paradigm Comparison</h1>
-    <p class="fig-number">Fig. 6. Comparison of security paradigms across programming languages.</p>
+    <h1>Аюулгүй байдлын парадигмын харьцуулалт</h1>
+    <p class="fig-number">Зураг 6. Програмчлалын хэлнүүдийн аюулгүй байдлын парадигмын харьцуулалт.</p>
     <div class="chart-container">
         <canvas id="paradigmChart"></canvas>
     </div>
-    <button class="export-btn" onclick="exportToImage()">Export As PNG</button>
+    <button class="export-btn" onclick="exportToImage()">PNG болгон экспортлох</button>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -127,8 +127,8 @@
                             position: 'left',
                             ticks: {
                                 callback: function(value) {
-                                    if (value === 0) return 'Low';
-                                    if (value === 100) return 'High';
+                                    if (value === 0) return 'Бага';
+                                    if (value === 100) return 'Өндөр';
                                     return '';
                                 },
                                 font: {
@@ -147,7 +147,7 @@
                             },
                             title: {
                                 display: true,
-                                text: 'Security Level',
+                                text: 'Аюулгүй байдлын түвшин',
                                 font: {
                                     family: "'Times New Roman', Times, serif",
                                     size: 12,
@@ -175,11 +175,11 @@
                                     const language = context.dataset.label;
                                     
                                     if (language === 'Java') {
-                                        return 'Java: Secure by default, minimal configuration needed';
+                                        return 'Java: Анхны тохиргоогоор аюулгүй, хамгийн бага тохиргоо шаардлагатай';
                                     } else if (language === 'TypeScript') {
-                                        return 'TypeScript: Balanced security requiring moderate configuration';
+                                        return 'TypeScript: Дунд зэргийн тохиргоо шаардлагатай тэнцвэртэй аюулгүй байдал';
                                     } else if (language === 'Golang') {
-                                        return 'Golang: Security through explicitness, significant manual implementation';
+                                        return 'Golang: Тодорхой байдлаар аюулгүй байдал, их хэмжээний гараар хэрэгжүүлэлт';
                                     }
                                 }
                             },
@@ -194,7 +194,7 @@
                                     type: 'label',
                                     xValue: 0,
                                     yValue: -10,
-                                    content: ['Default Security'],
+                                    content: ['Анхны аюулгүй байдал'],
                                     font: {
                                         family: "'Times New Roman', Times, serif",
                                         size: 12
@@ -205,7 +205,7 @@
                                     type: 'label',
                                     xValue: 100,
                                     yValue: -10,
-                                    content: ['Manual Config'],
+                                    content: ['Гараар тохируулалт'],
                                     font: {
                                         family: "'Times New Roman', Times, serif",
                                         size: 12

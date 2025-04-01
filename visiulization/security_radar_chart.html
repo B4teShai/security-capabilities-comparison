@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="mn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IEEE Figure: Security Capabilities Radar Chart</title>
+    <title>IEEE Зураг: Аюулгүй байдлын чадваруудын радар диаграмм</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
@@ -74,8 +74,8 @@
     </style>
 </head>
 <body>
-    <h1>Security Capabilities Comparison</h1>
-    <p class="fig-number">Fig. 1. Radar chart showing security capabilities across nine domains.</p>
+    <h1>Аюулгүй байдлын чадваруудын харьцуулалт</h1>
+    <p class="fig-number">Зураг 1. Есөн домэйнд аюулгүй байдлын чадваруудыг харуулсан радар диаграмм.</p>
     <div class="chart-container">
         <canvas id="radarChart"></canvas>
     </div>
@@ -93,7 +93,7 @@
             <span>Golang</span>
         </div>
     </div>
-    <button class="export-btn" onclick="exportToImage()">Export As PNG</button>
+    <button class="export-btn" onclick="exportToImage()">PNG болгон экспортлох</button>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -103,15 +103,15 @@
                 type: 'radar',
                 data: {
                     labels: [
-                        'Input Validation', 
-                        'XSS Protection', 
-                        'JWT Security',
-                        'CSRF Protection', 
-                        'Cookie Security', 
-                        'Security Headers',
-                        'Rate Limiting',
-                        'Error Handling', 
-                        'Dependency Security'
+                        'Оролтын баталгаажуулалт', 
+                        'XSS хамгаалалт', 
+                        'JWT аюулгүй байдал',
+                        'CSRF хамгаалалт', 
+                        'Cookie аюулгүй байдал', 
+                        'Аюулгүй байдлын толгойнууд',
+                        'Хурдны хязгаарлалт',
+                        'Алдааны боловсруулалт', 
+                        'Хамаарлын аюулгүй байдал'
                     ],
                     datasets: [
                         {
@@ -201,7 +201,7 @@
                                         label += ': ';
                                     }
                                     
-                                    const ratings = ['Vulnerable', 'Poor', 'Partial', 'Adequate', 'Good', 'Excellent'];
+                                    const ratings = ['Эмзэг', 'Муу', 'Хэсэгчилсэн', 'Хангалттай', 'Сайн', 'Онцгой'];
                                     label += context.raw + ' - ' + ratings[context.raw];
                                     
                                     return label;

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="mn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IEEE Figure: Security Maturity Model</title>
+    <title>IEEE Зураг: Аюулгүй байдлын боловсролын түвшин</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
@@ -72,46 +72,46 @@
     </style>
 </head>
 <body>
-    <h1>Security Maturity Model</h1>
-    <p class="fig-number">Fig. 5. Proposed security maturity model for programming language ecosystems.</p>
+    <h1>Аюулгүй байдлын боловсролын түвшин</h1>
+    <p class="fig-number">Зураг 5. Програмчлалын хэлний экосистемийн санал болгосон аюулгүй байдлын боловсролын түвшин.</p>
     <div class="chart-container">
         <canvas id="maturityChart"></canvas>
     </div>
     
     <table>
         <tr>
-            <th>Level</th>
-            <th>Description</th>
-            <th>Language</th>
+            <th>Түвшин</th>
+            <th>Тайлбар</th>
+            <th>Хэл</th>
         </tr>
         <tr>
-            <td>Level 5</td>
-            <td>Industry Leading: Comprehensive security with minimal configuration</td>
+            <td>Түвшин 5</td>
+            <td>Сарын түвшин: Хамгийн бага тохиргоотой иж бүрэн аюулгүй байдал</td>
             <td>Java</td>
         </tr>
         <tr>
-            <td>Level 4</td>
-            <td>Comprehensive: Strong security with moderate configuration</td>
+            <td>Түвшин 4</td>
+            <td>Иж бүрэн: Дунд зэргийн тохиргоотой хүчирхэг аюулгүй байдал</td>
             <td>TypeScript</td>
         </tr>
         <tr>
-            <td>Level 3</td>
-            <td>Established: Good security with significant configuration</td>
+            <td>Түвшин 3</td>
+            <td>Тогтвортой: Их хэмжээний тохиргоотой сайн аюулгүй байдал</td>
             <td>Golang</td>
         </tr>
         <tr>
-            <td>Level 2</td>
-            <td>Emerging: Basic security with extensive configuration</td>
+            <td>Түвшин 2</td>
+            <td>Хөгжиж буй: Өргөн хүрээний тохиргоотой үндсэн аюулгүй байдал</td>
             <td>-</td>
         </tr>
         <tr>
-            <td>Level 1</td>
-            <td>Basic: Minimal security, requires complete custom implementation</td>
+            <td>Түвшин 1</td>
+            <td>Үндсэн: Хамгийн бага аюулгүй байдал, бүрэн өөрөө хийсэн хэрэгжүүлэлт шаардлагатай</td>
             <td>-</td>
         </tr>
     </table>
     
-    <button class="export-btn" onclick="exportToImage()">Export As PNG</button>
+    <button class="export-btn" onclick="exportToImage()">PNG болгон экспортлох</button>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -149,7 +149,7 @@
             const maturityChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5'],
+                    labels: ['Түвшин 1', 'Түвшин 2', 'Түвшин 3', 'Түвшин 4', 'Түвшин 5'],
                     datasets: [
                         {
                             label: 'Java',
@@ -179,7 +179,7 @@
                         x: {
                             title: {
                                 display: true,
-                                text: 'Security Maturity Level',
+                                text: 'Аюулгүй байдлын боловсролын түвшин',
                                 font: {
                                     family: "'Times New Roman', Times, serif",
                                     size: 12,
@@ -203,7 +203,7 @@
                             max: 5,
                             title: {
                                 display: true,
-                                text: 'Rating',
+                                text: 'Үнэлгээ',
                                 font: {
                                     family: "'Times New Roman', Times, serif",
                                     size: 12,
@@ -243,23 +243,17 @@
                             callbacks: {
                                 title: function(tooltipItems) {
                                     const levelDescriptions = [
-                                        'Basic: Minimal security, requires complete custom implementation',
-                                        'Emerging: Basic security with extensive configuration, limited ecosystem',
-                                        'Established: Good security with significant configuration, growing ecosystem',
-                                        'Comprehensive: Strong security with moderate configuration, robust ecosystem',
-                                        'Industry Leading: Comprehensive security with minimal configuration, extensive ecosystem'
+                                        'Үндсэн: Хамгийн бага аюулгүй байдал, бүрэн өөрөө хийсэн хэрэгжүүлэлт шаардлагатай',
+                                        'Хөгжиж буй: Өргөн хүрээний тохиргоотой үндсэн аюулгүй байдал, хязгаарлагдмал экосистем',
+                                        'Тогтвортой: Их хэмжээний тохиргоотой сайн аюулгүй байдал, хөгжиж буй экосистем',
+                                        'Иж бүрэн: Дунд зэргийн тохиргоотой хүчирхэг аюулгүй байдал, хүчирхэг экосистем',
+                                        'Сарын түвшин: Хамгийн бага тохиргоотой иж бүрэн аюулгүй байдал, өргөн хүрээний экосистем'
                                     ];
-                                    return `${tooltipItems[0].label}: ${levelDescriptions[tooltipItems[0].dataIndex]}`;
+                                    return levelDescriptions[tooltipItems[0].dataIndex];
                                 }
-                            },
-                            bodyFont: {
-                                family: "'Times New Roman', Times, serif",
-                                size: 10
                             }
                         }
-                    },
-                    responsive: true,
-                    maintainAspectRatio: false
+                    }
                 }
             });
         });
