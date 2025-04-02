@@ -16,6 +16,9 @@ JAVA_PORT=${JAVA_PORT:-8081}
 TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
 RESULT_FILE="language_security_comparison_${TIMESTAMP}.log"
 
+# Test results
+declare -A results
+
 # Function to check if a service is running
 check_service() {
     local port=$1
@@ -59,6 +62,169 @@ make_request() {
     
     echo "$response"
     return 0
+}
+
+# Function to print section headers
+print_section() {
+    echo -e "\n${YELLOW}=== $1 ===${NC}"
+}
+
+# Function to test endpoint
+test_endpoint() {
+    local url=$1
+    local method=${2:-GET}
+    local data=$3
+    local headers=$4
+    
+    if [ -n "$data" ]; then
+        curl -s -X "$method" -H "Content-Type: application/json" -H "$headers" -d "$data" "$url"
+    else
+        curl -s -X "$method" -H "$headers" "$url"
+    fi
+}
+
+# Function to check security headers
+check_security_headers() {
+    local url=$1
+    local service=$2
+    
+    print_section "Testing Security Headers for $service"
+    
+    local headers=$(curl -s -I "$url")
+    local score=0
+    
+    # Check for various security headers
+    if echo "$headers" | grep -q "X-Frame-Options"; then
+        echo -e "${GREEN}✓ X-Frame-Options present${NC}"
+        score=$((score + 1))
+    else
+        echo -e "${RED}✗ X-Frame-Options missing${NC}"
+    fi
+    
+    if echo "$headers" | grep -q "X-Content-Type-Options"; then
+        echo -e "${GREEN}✓ X-Content-Type-Options present${NC}"
+        score=$((score + 1))
+    else
+        echo -e "${RED}✗ X-Content-Type-Options missing${NC}"
+    fi
+    
+    if echo "$headers" | grep -q "X-XSS-Protection"; then
+        echo -e "${GREEN}✓ X-XSS-Protection present${NC}"
+        score=$((score + 1))
+    else
+        echo -e "${RED}✗ X-XSS-Protection missing${NC}"
+    fi
+    
+    if echo "$headers" | grep -q "Strict-Transport-Security"; then
+        echo -e "${GREEN}✓ HSTS present${NC}"
+        score=$((score + 1))
+    else
+        echo -e "${RED}✗ HSTS missing${NC}"
+    fi
+    
+    echo "$score"
+}
+
+# Function to test SQL injection protection
+test_sql_injection() {
+    local service=$1
+    local base_url=$2
+    
+    print_section "Testing SQL Injection Protection for $service"
+    
+    local payloads=(
+        "' OR '1'='1"
+        "admin'--"
+        "'; DROP TABLE users;--"
+        "' UNION SELECT * FROM users;--"
+    )
+    
+    local score=0
+    for payload in "${payloads[@]}"; do
+        local response=$(test_endpoint "$base_url/login" "POST" "{\"username\":\"$payload\",\"password\":\"test\"}")
+        if [[ $response == *"Invalid credentials"* ]]; then
+            echo -e "${GREEN}✓ Protected against SQL injection: $payload${NC}"
+            score=$((score + 1))
+        else
+            echo -e "${RED}✗ Vulnerable to SQL injection: $payload${NC}"
+        fi
+    done
+    
+    echo "$score"
+}
+
+# Function to test JWT token security
+test_jwt_security() {
+    local service=$1
+    local base_url=$2
+    
+    print_section "Testing JWT Token Security for $service"
+    
+    local score=0
+    
+    # Test invalid token
+    local response=$(test_endpoint "$base_url/protected" "GET" "" "Authorization: invalid-token")
+    if [[ $response == *"Invalid token"* ]]; then
+        echo -e "${GREEN}✓ Invalid token rejected${NC}"
+        score=$((score + 1))
+    else
+        echo -e "${RED}✗ Invalid token accepted${NC}"
+    fi
+    
+    # Test expired token
+    local expired_token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6InRlc3QiLCJleHAiOjE1MTYyMzkwMjJ9.4Adcj3UFYzPUVaVF43FmMze6JcZgqVh3qVh3qVh3qVh3"
+    response=$(test_endpoint "$base_url/protected" "GET" "" "Authorization: $expired_token")
+    if [[ $response == *"Invalid token"* ]]; then
+        echo -e "${GREEN}✓ Expired token rejected${NC}"
+        score=$((score + 1))
+    else
+        echo -e "${RED}✗ Expired token accepted${NC}"
+    fi
+    
+    echo "$score"
+}
+
+# Function to test rate limiting
+test_rate_limiting() {
+    local service=$1
+    local base_url=$2
+    
+    print_section "Testing Rate Limiting for $service"
+    
+    local score=0
+    for i in $(seq 1 10); do
+        local response=$(test_endpoint "$base_url/login" "POST" "{\"username\":\"test\",\"password\":\"test\"}")
+        if [[ $response == *"Too many requests"* ]]; then
+            echo -e "${GREEN}✓ Rate limiting detected after $i requests${NC}"
+            score=1
+            break
+        fi
+    done
+    
+    if [ $score -eq 0 ]; then
+        echo -e "${RED}✗ No rate limiting detected${NC}"
+    fi
+    
+    echo "$score"
+}
+
+# Function to measure response time
+measure_response_time() {
+    local url=$1
+    local iterations=${2:-10}
+    local total_time=0
+    
+    for i in $(seq 1 $iterations); do
+        local start_time=$(date +%s%N)
+        curl -s -f "$url" > /dev/null
+        local end_time=$(date +%s%N)
+        local duration=$((end_time - start_time))
+        total_time=$((total_time + duration))
+        sleep 0.1
+    done
+    
+    # Convert nanoseconds to milliseconds with proper decimal handling
+    echo "scale=2; $total_time / ($iterations * 1000000)" | bc -l
 }
 
 # Initialize arrays to store test results
@@ -687,4 +853,4 @@ cat << EOF > visualization_data.json
 }
 EOF
 
-echo -e "${GREEN}Security test complete! Results saved to $RESULT_FILE${NC}
+echo -e "${GREEN}Security test complete! Results saved to $RESULT_FILE${NC}"

@@ -1,0 +1,87 @@
+{
+  "security_paradigm_comparison": {
+    "golang": {
+      "security_level": 5,
+      "manual_configuration": -4
+    },
+    "typescript": {
+      "security_level": 5,
+      "manual_configuration": -3
+    },
+    "java": {
+      "security_level": 5,
+      "manual_configuration": -2
+    }
+  },
+  "security_code_distribution": {
+    "golang": {
+      "validation": 5,
+      "authentication": 5,
+      "headers": -4,
+      "error_handling": 5,
+      "csrf_protection": 4,
+      "rate_limiting": 5,
+      "dependency_security": 5
+    },
+    "typescript": {
+      "validation": 5,
+      "authentication": 5,
+      "headers": -3,
+      "error_handling": 5,
+      "csrf_protection": 4,
+      "rate_limiting": 5,
+      "dependency_security": 4
+    },
+    "java": {
+      "validation": 5,
+      "authentication": 5,
+      "headers": -2,
+      "error_handling": 5,
+      "csrf_protection": 4,
+      "rate_limiting": 5,
+      "dependency_security": 4
+    }
+  },
+  "security_maturity_model": {
+    "golang": 4,
+    "typescript": 4,
+    "java": 4
+  },
+  "implementation_effort": {
+    "golang": 9,
+    "typescript": 8,
+    "java": 7
+  },
+  "security_radar": {
+    "golang": {
+      "input_validation": 5,
+      "sql_injection": 5,
+      "jwt_security": 5,
+      "security_headers": -4,
+      "error_handling": 5,
+      "csrf_protection": 4,
+      "rate_limiting": 5,
+      "dependency_security": 5
+    },
+    "typescript": {
+      "input_validation": 5,
+      "sql_injection": 5,
+      "jwt_security": 5,
+      "security_headers": -3,
+      "error_handling": 5,
+      "csrf_protection": 4,
+      "rate_limiting": 5,
+      "dependency_security": 4
+    },
+    "java": {
+      "input_validation": 5,
+      "sql_injection": 5,
+      "jwt_security": 5,
+      "security_headers": -2,
+      "error_handling": 5,
+      "csrf_protection": 4,
+      "rate_limiting": 5,
+      "dependency_security": 4
+    }
+  }
+}
