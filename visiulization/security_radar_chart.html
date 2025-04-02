@@ -96,60 +96,48 @@
     <button class="export-btn" onclick="exportToImage()">PNG болгон экспортлох</button>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        // Fetch the visualization data
+        fetch('/visualization_data.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                const radarData = data.security_radar;
+                createChart(radarData);
+            })
+            .catch(error => console.error('Error loading data:', error));
+
+        function createChart(radarData) {
             const ctx = document.getElementById('radarChart').getContext('2d');
             
-            const radarChart = new Chart(ctx, {
+            const languages = Object.keys(radarData);
+            const metrics = Object.keys(radarData[languages[0]]);
+            
+            const datasets = languages.map((lang, index) => ({
+                label: lang,
+                data: metrics.map(metric => radarData[lang][metric]),
+                backgroundColor: [
+                    'rgba(25, 60, 125, 0.2)',
+                    'rgba(84, 135, 172, 0.2)',
+                    'rgba(162, 184, 194, 0.2)'
+                ][index],
+                borderColor: [
+                    'rgba(25, 60, 125, 1)',
+                    'rgba(84, 135, 172, 1)',
+                    'rgba(162, 184, 194, 1)'
+                ][index],
+                borderWidth: 2,
+                pointRadius: 3
+            }));
+
+            new Chart(ctx, {
                 type: 'radar',
                 data: {
-                    labels: [
-                        'Оролтын баталгаажуулалт', 
-                        'XSS хамгаалалт', 
-                        'JWT аюулгүй байдал',
-                        'CSRF хамгаалалт', 
-                        'Cookie аюулгүй байдал', 
-                        'Аюулгүй байдлын толгойнууд',
-                        'Хурдны хязгаарлалт',
-                        'Алдааны боловсруулалт', 
-                        'Хамаарлын аюулгүй байдал'
-                    ],
-                    datasets: [
-                        {
-                            label: 'Java',
-                            data: [5, 5, 5, 5, 5, 0, 5, 5, 5],
-                            backgroundColor: 'rgba(25, 60, 125, 0.1)',
-                            borderColor: 'rgba(25, 60, 125, 0.9)',
-                            borderWidth: 1.5,
-                            pointBackgroundColor: 'rgba(25, 60, 125, 0.9)',
-                            pointBorderColor: '#fff',
-                            pointHoverBackgroundColor: '#fff',
-                            pointHoverBorderColor: 'rgba(25, 60, 125, 0.9)'
-                        },
-                        {
-                            label: 'TypeScript',
-                            data: [5, 5, 5, 5, 5, 0, 5, 5, 5],
-                            backgroundColor: 'rgba(84, 135, 172, 0.1)',
-                            borderColor: 'rgba(84, 135, 172, 0.9)',
-                            borderWidth: 1.5,
-                            pointBackgroundColor: 'rgba(84, 135, 172, 0.9)',
-                            pointBorderColor: '#fff',
-                            pointHoverBackgroundColor: '#fff',
-                            pointHoverBorderColor: 'rgba(84, 135, 172, 0.9)',
-                            borderDash: [4, 4]
-                        },
-                        {
-                            label: 'Golang',
-                            data: [5, 5, 5, 5, 5, 1, 5, 4, 5],
-                            backgroundColor: 'rgba(162, 184, 194, 0.1)',
-                            borderColor: 'rgba(162, 184, 194, 0.9)',
-                            borderWidth: 1.5,
-                            pointBackgroundColor: 'rgba(162, 184, 194, 0.9)',
-                            pointBorderColor: '#fff',
-                            pointHoverBackgroundColor: '#fff',
-                            pointHoverBorderColor: 'rgba(162, 184, 194, 0.9)',
-                            borderDash: [2, 2]
-                        }
-                    ]
+                    labels: metrics.map(m => m.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')),
+                    datasets: datasets
                 },
                 options: {
                     elements: {
@@ -173,7 +161,7 @@
                                 },
                                 color: 'black'
                             },
-                            suggestedMin: 0,
+                            suggestedMin: -5,
                             suggestedMax: 5,
                             ticks: {
                                 stepSize: 1,
@@ -202,7 +190,7 @@
                                     }
                                     
                                     const ratings = ['Эмзэг', 'Муу', 'Хэсэгчилсэн', 'Хангалттай', 'Сайн', 'Онцгой'];
-                                    label += context.raw + ' - ' + ratings[context.raw];
+                                    label += context.raw + ' - ' + ratings[context.raw + 5];
                                     
                                     return label;
                                 }
@@ -217,7 +205,7 @@
                     maintainAspectRatio: false
                 }
             });
-        });
+        }
 
         function exportToImage() {
             const canvas = document.getElementById('radarChart');

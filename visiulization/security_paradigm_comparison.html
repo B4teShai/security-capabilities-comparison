@@ -67,42 +67,39 @@
     <button class="export-btn" onclick="exportToImage()">PNG болгон экспортлох</button>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        // Fetch the visualization data
+        fetch('../visualization_data.json')
+            .then(response => response.json())
+            .then(data => {
+                const paradigmData = data.security_paradigm_comparison;
+                createChart(paradigmData);
+            })
+            .catch(error => console.error('Error loading data:', error));
+
+        function createChart(paradigmData) {
             const ctx = document.getElementById('paradigmChart').getContext('2d');
             
-            // Custom scatter plot for paradigm positioning
-            const paradigmChart = new Chart(ctx, {
-                type: 'scatter',
+            const languages = Object.keys(paradigmData);
+            const securityLevels = languages.map(lang => paradigmData[lang].security_level);
+            const manualConfig = languages.map(lang => paradigmData[lang].manual_configuration);
+
+            new Chart(ctx, {
+                type: 'bar',
                 data: {
-                    datasets: [
-                        {
-                            label: 'Java',
-                            data: [{x: 20, y: 90}],
-                            backgroundColor: 'rgba(25, 60, 125, 0.9)',
-                            borderColor: 'rgba(25, 60, 125, 1)',
-                            borderWidth: 2,
-                            pointRadius: 10,
-                            pointHoverRadius: 12
-                        },
-                        {
-                            label: 'TypeScript',
-                            data: [{x: 20, y: 90}],
-                            backgroundColor: 'rgba(84, 135, 172, 0.9)',
-                            borderColor: 'rgba(84, 135, 172, 1)',
-                            borderWidth: 2,
-                            pointRadius: 10,
-                            pointHoverRadius: 12
-                        },
-                        {
-                            label: 'Golang',
-                            data: [{x: 80, y: 90}],
-                            backgroundColor: 'rgba(162, 184, 194, 0.9)',
-                            borderColor: 'rgba(162, 184, 194, 1)',
-                            borderWidth: 2,
-                            pointRadius: 10,
-                            pointHoverRadius: 12
-                        }
-                    ]
+                    labels: languages,
+                    datasets: [{
+                        label: 'Security Level',
+                        data: securityLevels,
+                        backgroundColor: 'rgba(25, 60, 125, 0.9)',
+                        borderColor: 'rgba(25, 60, 125, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: 'Manual Configuration',
+                        data: manualConfig,
+                        backgroundColor: 'rgba(162, 184, 194, 0.9)',
+                        borderColor: 'rgba(162, 184, 194, 1)',
+                        borderWidth: 1
+                    }]
                 },
                 options: {
                     scales: {
@@ -239,7 +236,7 @@
                     maintainAspectRatio: false
                 }
             });
-        });
+        }
 
         function exportToImage() {
             const canvas = document.getElementById('paradigmChart');

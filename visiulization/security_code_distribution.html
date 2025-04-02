@@ -69,36 +69,42 @@
     <button class="export-btn" onclick="exportToImage()">PNG болгон экспортлох</button>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        // Fetch the visualization data
+        fetch('../visualization_data.json')
+            .then(response => response.json())
+            .then(data => {
+                const distributionData = data.security_code_distribution;
+                createChart(distributionData);
+            })
+            .catch(error => console.error('Error loading data:', error));
+
+        function createChart(distributionData) {
             const ctx = document.getElementById('distributionChart').getContext('2d');
             
-            const distributionChart = new Chart(ctx, {
-                type: 'bar',
+            const languages = Object.keys(distributionData);
+            const metrics = Object.keys(distributionData[languages[0]]);
+            
+            const datasets = languages.map((lang, index) => ({
+                label: lang,
+                data: metrics.map(metric => distributionData[lang][metric]),
+                backgroundColor: [
+                    'rgba(25, 60, 125, 0.9)',
+                    'rgba(84, 135, 172, 0.9)',
+                    'rgba(162, 184, 194, 0.9)'
+                ][index],
+                borderColor: [
+                    'rgba(25, 60, 125, 1)',
+                    'rgba(84, 135, 172, 1)',
+                    'rgba(162, 184, 194, 1)'
+                ][index],
+                borderWidth: 1
+            }));
+
+            new Chart(ctx, {
+                type: 'radar',
                 data: {
-                    labels: ['Java', 'TypeScript', 'Golang'],
-                    datasets: [
-                        {
-                            label: 'Framework',
-                            data: [80, 80, 60],
-                            backgroundColor: 'rgba(25, 60, 125, 0.8)',
-                            borderColor: 'rgba(25, 60, 125, 1)',
-                            borderWidth: 1
-                        },
-                        {
-                            label: 'Тохиргоо',
-                            data: [15, 15, 20],
-                            backgroundColor: 'rgba(84, 135, 172, 0.8)',
-                            borderColor: 'rgba(84, 135, 172, 1)',
-                            borderWidth: 1
-                        },
-                        {
-                            label: 'Өөрөө хийсэн хэрэгжүүлэлт',
-                            data: [5, 5, 20],
-                            backgroundColor: 'rgba(162, 184, 194, 0.8)',
-                            borderColor: 'rgba(162, 184, 194, 1)',
-                            borderWidth: 1
-                        }
-                    ]
+                    labels: metrics.map(m => m.charAt(0).toUpperCase() + m.slice(1)),
+                    datasets: datasets
                 },
                 options: {
                     indexAxis: 'y',
@@ -185,7 +191,7 @@
                     maintainAspectRatio: false
                 }
             });
-        });
+        }
 
         function exportToImage() {
             const canvas = document.getElementById('distributionChart');

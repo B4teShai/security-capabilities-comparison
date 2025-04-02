@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="mn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IEEE Зураг: Аюулгүй байдлын хэрэгжүүлэлтийн хүчин чармайлт</title>
+    <title>IEEE Figure: Security Implementation Effort</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
@@ -49,15 +49,24 @@
     </style>
 </head>
 <body>
-    <h1>Аюулгүй байдлын хэрэгжүүлэлтийн хүчин чармайлт</h1>
-    <p class="fig-number">Зураг 2. Аюулгүй байдлын функцуудыг хэрэгжүүлэхэд шаардлагатай кодын мөрүүдийн харьцуулалт.</p>
+    <h1>Security Implementation Effort Comparison</h1>
+    <p class="fig-number">Figure 2. Comparison of effort required to implement security features across languages.</p>
     <div class="chart-container">
         <canvas id="barChart"></canvas>
     </div>
-    <button class="export-btn" onclick="exportToImage()">PNG болгон экспортлох</button>
+    <button class="export-btn" onclick="exportToImage()">Export as PNG</button>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        // Fetch the visualization data
+        fetch('../visualization_data.json')
+            .then(response => response.json())
+            .then(data => {
+                const implementationEffort = data.implementation_effort;
+                createChart(implementationEffort);
+            })
+            .catch(error => console.error('Error loading data:', error));
+
+        function createChart(implementationEffort) {
             const ctx = document.getElementById('barChart').getContext('2d');
             
             const barChart = new Chart(ctx, {
@@ -65,8 +74,12 @@
                 data: {
                     labels: ['Java', 'TypeScript', 'Golang'],
                     datasets: [{
-                        label: 'Аюулгүй байдлын тусгай кодын мөрүүд',
-                        data: [150, 150, 250],
+                        label: 'Implementation Effort Score',
+                        data: [
+                            implementationEffort.java,
+                            implementationEffort.typescript,
+                            implementationEffort.golang
+                        ],
                         backgroundColor: [
                             'rgba(25, 60, 125, 0.9)',
                             'rgba(84, 135, 172, 0.9)',
@@ -87,7 +100,7 @@
                             beginAtZero: true,
                             title: {
                                 display: true,
-                                text: 'Кодын мөрүүд',
+                                text: 'Implementation Effort Score',
                                 font: {
                                     family: "'Times New Roman', Times, serif",
                                     size: 12,
@@ -95,7 +108,7 @@
                                 },
                                 color: 'black'
                             },
-                            max: 400,
+                            max: 10,
                             ticks: {
                                 font: {
                                     family: "'Times New Roman', Times, serif",
@@ -130,17 +143,18 @@
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
-                                    return context.raw + ' мөр';
+                                    return 'Effort Score: ' + context.raw;
                                 },
                                 afterLabel: function(context) {
                                     const language = context.label;
+                                    const baselineEffort = implementationEffort.java;
+                                    const currentEffort = context.raw;
+                                    const ratio = (currentEffort / baselineEffort).toFixed(2);
                                     
                                     if (language === 'Java') {
-                                        return 'Үндсэн шугам: Java-гийн хүчин чармайлт 1×';
-                                    } else if (language === 'TypeScript') {
-                                        return 'Java-тай харьцуулахад 1× тэнцүү код';
-                                    } else if (language === 'Golang') {
-                                        return 'Java-тай харьцуулахад 1.67× илүү код';
+                                        return 'Baseline: Java effort 1×';
+                                    } else {
+                                        return `${ratio}× effort compared to Java`;
                                     }
                                 }
                             },
@@ -154,7 +168,7 @@
                     maintainAspectRatio: false
                 }
             });
-        });
+        }
 
         function exportToImage() {
             const canvas = document.getElementById('barChart');
