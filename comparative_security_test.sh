@@ -14,7 +14,7 @@ JAVA_PORT=${JAVA_PORT:-8081}
 
 # Create log file
 TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
-RESULT_FILE="language_security_comparison_${TIMESTAMP}.txt"
+RESULT_FILE="аюулгүй_байдлын_харьцуулалт_${TIMESTAMP}.log"
 
 # Test results
 declare -A results
@@ -24,7 +24,7 @@ check_service() {
     local port=$1
     local name=$2
     if ! curl -s -f "http://localhost:$port/health" > /dev/null; then
-        echo -e "${RED}Error: $name service is not running on port $port${NC}"
+        echo -e "${RED}Алдаа: $name үйлчилгээ $port портод ажиллахгүй байна${NC}"
         return 1
     fi
     return 0
@@ -56,7 +56,7 @@ make_request() {
     response=$(echo "$response" | sed '$d')
     
     if [ $? -ne 0 ]; then
-        echo -e "${RED}Error: Request failed${NC}"
+        echo -e "${RED}Алдаа: Хүсэлт амжилтгүй боллоо${NC}"
         return 1
     fi
     
@@ -87,38 +87,38 @@ check_security_headers() {
     local url=$1
     local service=$2
     
-    print_section "Testing Security Headers for $service"
+    print_section "$service-н аюулгүй байдлын header-үүдийг шалгаж байна"
     
     local headers=$(curl -s -I "$url")
     local score=0
     
     # Check for various security headers
     if echo "$headers" | grep -q "X-Frame-Options"; then
-        echo -e "${GREEN}✓ X-Frame-Options present${NC}"
+        echo -e "${GREEN}✓ X-Frame-Options байна${NC}"
         score=$((score + 1))
     else
-        echo -e "${RED}✗ X-Frame-Options missing${NC}"
+        echo -e "${RED}✗ X-Frame-Options байхгүй${NC}"
     fi
     
     if echo "$headers" | grep -q "X-Content-Type-Options"; then
-        echo -e "${GREEN}✓ X-Content-Type-Options present${NC}"
+        echo -e "${GREEN}✓ X-Content-Type-Options байна${NC}"
         score=$((score + 1))
     else
-        echo -e "${RED}✗ X-Content-Type-Options missing${NC}"
+        echo -e "${RED}✗ X-Content-Type-Options байхгүй${NC}"
     fi
     
     if echo "$headers" | grep -q "X-XSS-Protection"; then
-        echo -e "${GREEN}✓ X-XSS-Protection present${NC}"
+        echo -e "${GREEN}✓ X-XSS-Protection байна${NC}"
         score=$((score + 1))
     else
-        echo -e "${RED}✗ X-XSS-Protection missing${NC}"
+        echo -e "${RED}✗ X-XSS-Protection байхгүй${NC}"
     fi
     
     if echo "$headers" | grep -q "Strict-Transport-Security"; then
-        echo -e "${GREEN}✓ HSTS present${NC}"
+        echo -e "${GREEN}✓ HSTS байна${NC}"
         score=$((score + 1))
     else
-        echo -e "${RED}✗ HSTS missing${NC}"
+        echo -e "${RED}✗ HSTS байхгүй${NC}"
     fi
     
     echo "$score"
@@ -129,7 +129,7 @@ test_sql_injection() {
     local service=$1
     local base_url=$2
     
-    print_section "Testing SQL Injection Protection for $service"
+    print_section "$service-н SQL Injection хамгаалалтыг шалгаж байна"
     
     local payloads=(
         "' OR '1'='1"
@@ -142,10 +142,10 @@ test_sql_injection() {
     for payload in "${payloads[@]}"; do
         local response=$(test_endpoint "$base_url/login" "POST" "{\"username\":\"$payload\",\"password\":\"test\"}")
         if [[ $response == *"Invalid credentials"* ]]; then
-            echo -e "${GREEN}✓ Protected against SQL injection: $payload${NC}"
+            echo -e "${GREEN}✓ SQL injection халдлагаас хамгаалагдсан: $payload${NC}"
             score=$((score + 1))
         else
-            echo -e "${RED}✗ Vulnerable to SQL injection: $payload${NC}"
+            echo -e "${RED}✗ SQL injection халдлагад өртөмтгий: $payload${NC}"
         fi
     done
     
@@ -157,27 +157,27 @@ test_jwt_security() {
     local service=$1
     local base_url=$2
     
-    print_section "Testing JWT Token Security for $service"
+    print_section "$service-н JWT токен аюулгүй байдлыг шалгаж байна"
     
     local score=0
     
     # Test invalid token
     local response=$(test_endpoint "$base_url/protected" "GET" "" "Authorization: invalid-token")
     if [[ $response == *"Invalid token"* ]]; then
-        echo -e "${GREEN}✓ Invalid token rejected${NC}"
+        echo -e "${GREEN}✓ Буруу токенийг хүлээн авахгүй байна${NC}"
         score=$((score + 1))
     else
-        echo -e "${RED}✗ Invalid token accepted${NC}"
+        echo -e "${RED}✗ Буруу токенийг хүлээн авч байна${NC}"
     fi
     
     # Test expired token
     local expired_token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6InRlc3QiLCJleHAiOjE1MTYyMzkwMjJ9.4Adcj3UFYzPUVaVF43FmMze6JcZgqVh3qVh3qVh3qVh3"
     response=$(test_endpoint "$base_url/protected" "GET" "" "Authorization: $expired_token")
     if [[ $response == *"Invalid token"* ]]; then
-        echo -e "${GREEN}✓ Expired token rejected${NC}"
+        echo -e "${GREEN}✓ Хугацаа дууссан токенийг хүлээн авахгүй байна${NC}"
         score=$((score + 1))
     else
-        echo -e "${RED}✗ Expired token accepted${NC}"
+        echo -e "${RED}✗ Хугацаа дууссан токенийг хүлээн авч байна${NC}"
     fi
     
     echo "$score"
@@ -188,20 +188,20 @@ test_rate_limiting() {
     local service=$1
     local base_url=$2
     
-    print_section "Testing Rate Limiting for $service"
+    print_section "$service-н хүсэлтийн хязгаарлалтыг шалгаж байна"
     
     local score=0
     for i in $(seq 1 10); do
         local response=$(test_endpoint "$base_url/login" "POST" "{\"username\":\"test\",\"password\":\"test\"}")
         if [[ $response == *"Too many requests"* ]]; then
-            echo -e "${GREEN}✓ Rate limiting detected after $i requests${NC}"
+            echo -e "${GREEN}✓ $i хүсэлтийн дараа хязгаарлалт илэрлээ${NC}"
             score=1
             break
         fi
     done
     
     if [ $score -eq 0 ]; then
-        echo -e "${RED}✗ No rate limiting detected${NC}"
+        echo -e "${RED}✗ Хүсэлтийн хязгаарлалт байхгүй байна${NC}"
     fi
     
     echo "$score"
@@ -234,31 +234,31 @@ java_results=()
 # Header for the result file
 cat << EOF > "$RESULT_FILE"
 ================================================================================================
-                    Comparative Security Analysis of Golang, TypeScript, and Java
-                           Test Date: $(date)
+                    Програмчлалын хэлнүүдийн аюулгүй байдлын харьцуулалт
+                           Тестийн огноо: $(date)
 ================================================================================================
 
-This analysis compares the security capabilities in three different programming language implementations:
-- Golang (port $GOLANG_PORT)
-- TypeScript (port $TYPESCRIPT_PORT)
-- Java Spring Boot (port $JAVA_PORT)
+Энэхүү дүн шинжилгээ нь гурван өөр програмчлалын хэлний аюулгүй байдлын чадварыг харьцуулж байна:
+- Golang (порт $GOLANG_PORT)
+- TypeScript (порт $TYPESCRIPT_PORT)
+- Java Spring Boot (порт $JAVA_PORT)
 
-The following critical security tests were performed:
-1. Input Validation & Sanitization
-2. SQL Injection Protection
-3. JWT Token Security
-4. Security Headers Implementation
-5. Error Handling & Information Disclosure
-6. CSRF Protection
-7. Rate Limiting
-8. Dependency Security
+Дараах чухал аюулгүй байдлын тестүүдийг гүйцэтгэсэн:
+1. Оролтын өгөгдлийн баталгаажуулалт
+2. SQL Injection халдлагаас хамгаалалт
+3. JWT токен аюулгүй байдал
+4. Аюулгүй байдлын header-үүд
+5. Алдааны мэдээллийн задралт
+6. CSRF халдлагаас хамгаалалт
+7. Хүсэлтийн хязгаарлалт
+8. Хамаарлын сан аюулгүй байдал
 
 EOF
 
-echo -e "${YELLOW}Starting critical security comparison test...${NC}"
+echo -e "${YELLOW}Аюулгүй байдлын харьцуулах тест эхэллээ...${NC}"
 
 # Check if all services are running
-echo -e "${BLUE}Checking service availability...${NC}"
+echo -e "${BLUE}Үйлчилгээнүүдийн боломжит байдлыг шалгаж байна...${NC}"
 for service in "Golang:$GOLANG_PORT" "TypeScript:$TYPESCRIPT_PORT" "Java:$JAVA_PORT"; do
     IFS=":" read -r name port <<< "$service"
     if ! check_service "$port" "$name"; then
@@ -268,8 +268,8 @@ for service in "Golang:$GOLANG_PORT" "TypeScript:$TYPESCRIPT_PORT" "Java:$JAVA_P
 done
 
 # ================ TEST 1: INPUT VALIDATION ================
-echo -e "${BLUE}Testing Input Validation Mechanisms...${NC}"
-echo -e "\n## 1. INPUT VALIDATION MECHANISMS\n" >> "$RESULT_FILE"
+echo -e "${BLUE}Оролтын өгөгдлийн баталгаажуулалтыг шалгаж байна...${NC}"
+echo -e "\n## 1. ОРОЛТЫН ӨГӨГДЛИЙН БАТАЛГААЖУУЛАЛТ\n" >> "$RESULT_FILE"
 
 # input validation
 input_payloads=(
@@ -291,8 +291,8 @@ for impl in "Golang:$GOLANG_PORT" "TypeScript:$TYPESCRIPT_PORT" "Java:$JAVA_PORT
     for payload in "${input_payloads[@]}"; do
         response=$(make_request "http://localhost:$port/register" "POST" "$payload")
         if [ $? -eq 0 ]; then
-            echo -e "Test payload: $payload" >> "$RESULT_FILE"
-            echo -e "Response: $response\n" >> "$RESULT_FILE"
+            echo -e "Тест хийгдэж байна: $payload" >> "$RESULT_FILE"
+            echo -e "Хариу: $response\n" >> "$RESULT_FILE"
             
             if [[ "$response" =~ "error" || "$response" =~ "Status: 200" ]]; then
                 validation_failures=$((validation_failures + 1))
@@ -312,8 +312,8 @@ done
 wait
 
 # ================ TEST 2: SQL INJECTION PROTECTION ================
-echo -e "${BLUE}Testing SQL Injection Protection...${NC}"
-echo -e "\n## 2. SQL INJECTION PROTECTION\n" >> "$RESULT_FILE"
+echo -e "${BLUE}SQL Injection халдлагаас хамгаалалтыг шалгаж байна...${NC}"
+echo -e "\n## 2. SQL INJECTION ХАЛДЛАГААС ХАМГААЛАЛТ\n" >> "$RESULT_FILE"
 
 # SQL injection payloads
 sqli_payloads=(
@@ -334,8 +334,8 @@ for impl in "Golang:$GOLANG_PORT" "TypeScript:$TYPESCRIPT_PORT" "Java:$JAVA_PORT
     for payload in "${sqli_payloads[@]}"; do
         response=$(make_request "http://localhost:$port/login" "POST" "$payload")
         if [ $? -eq 0 ]; then
-            echo -e "Test payload: $payload" >> "$RESULT_FILE"
-            echo -e "Response: $response\n" >> "$RESULT_FILE"
+            echo -e "Тест хийгдэж байна: $payload" >> "$RESULT_FILE"
+            echo -e "Хариу: $response\n" >> "$RESULT_FILE"
             
             if [[ "$response" =~ "success" || "$response" =~ "logged in" ]]; then
                 sqli_vulnerabilities=$((sqli_vulnerabilities + 1))
@@ -353,8 +353,8 @@ done
 wait
 
 # ================ TEST 3: JWT TOKEN SECURITY ================
-echo -e "${BLUE}Testing JWT Token Security...${NC}"
-echo -e "\n## 3. JWT TOKEN SECURITY\n" >> "$RESULT_FILE"
+echo -e "${BLUE}JWT токен аюулгүй байдлыг шалгаж байна...${NC}"
+echo -e "\n## 3. JWT ТОКЕН АЮУЛГҮЙ БАЙДАЛ\n" >> "$RESULT_FILE"
 
 # Enhanced JWT test payloads
 jwt_payloads=(
@@ -374,8 +374,8 @@ for impl in "Golang:$GOLANG_PORT" "TypeScript:$TYPESCRIPT_PORT" "Java:$JAVA_PORT
     for token in "${jwt_payloads[@]}"; do
         response=$(make_request "http://localhost:$port/protected" "GET" "" "Authorization: Bearer $token")
         if [ $? -eq 0 ]; then
-            echo -e "Test token: $token" >> "$RESULT_FILE"
-            echo -e "Response: $response\n" >> "$RESULT_FILE"
+            echo -e "Тест хийгдэж байна: $token" >> "$RESULT_FILE"
+            echo -e "Хариу: $response\n" >> "$RESULT_FILE"
             
             if [[ "$response" =~ "Status: 200" ]]; then
                 jwt_vulnerabilities=$((jwt_vulnerabilities + 1))
@@ -393,8 +393,8 @@ done
 wait
 
 # ================ TEST 4: SECURITY HEADERS ================
-echo -e "${BLUE}Testing Security Headers...${NC}"
-echo -e "\n## 4. SECURITY HEADERS\n" >> "$RESULT_FILE"
+echo -e "${BLUE}Аюулгүй байдлын header-үүдийг шалгаж байна...${NC}"
+echo -e "\n## 4. АЮУЛГҮЙ БАЙДЛЫН HEADER-ҮҮД\n" >> "$RESULT_FILE"
 
 # Enhanced security headers to check
 security_headers=(
@@ -418,16 +418,16 @@ for impl in "Golang:$GOLANG_PORT" "TypeScript:$TYPESCRIPT_PORT" "Java:$JAVA_PORT
     
     headers_response=$(curl -s -I "http://localhost:$port/")
     
-    echo -e "Response Headers:" >> "$RESULT_FILE"
+    echo -e "Хариу header-үүд:" >> "$RESULT_FILE"
     echo -e "$headers_response\n" >> "$RESULT_FILE"
     
     missing_headers=0
-    echo -e "Security Headers Analysis:" >> "$RESULT_FILE"
+    echo -e "Аюулгүй байдлын header-үүдийн шинжилгээ:" >> "$RESULT_FILE"
     for header in "${security_headers[@]}"; do
         if echo "$headers_response" | grep -qi "$header"; then
-            echo -e "✅ $header: Present" >> "$RESULT_FILE"
+            echo -e "✅ $header: Байна" >> "$RESULT_FILE"
         else
-            echo -e "❌ $header: Missing" >> "$RESULT_FILE"
+            echo -e "❌ $header: Байхгүй" >> "$RESULT_FILE"
             missing_headers=$((missing_headers + 1))
         fi
     done
@@ -441,8 +441,8 @@ for impl in "Golang:$GOLANG_PORT" "TypeScript:$TYPESCRIPT_PORT" "Java:$JAVA_PORT
 done
 
 # ================ TEST 5: ERROR HANDLING ================
-echo -e "${BLUE}Testing Error Handling...${NC}"
-echo -e "\n## 5. ERROR HANDLING & INFORMATION DISCLOSURE\n" >> "$RESULT_FILE"
+echo -e "${BLUE}Алдааны боловсруулалтыг шалгаж байна...${NC}"
+echo -e "\n## 5. АЛДААНЫ МЭДЭЭЛЛИЙН ЗАДРАЛТ\n" >> "$RESULT_FILE"
 
 # Enhanced error test payloads
 error_payloads=(
@@ -464,8 +464,8 @@ for impl in "Golang:$GOLANG_PORT" "TypeScript:$TYPESCRIPT_PORT" "Java:$JAVA_PORT
     for payload in "${error_payloads[@]}"; do
         response=$(make_request "http://localhost:$port/login" "POST" "$payload")
         if [ $? -eq 0 ]; then
-            echo -e "Test payload: $payload" >> "$RESULT_FILE"
-            echo -e "Response: $response\n" >> "$RESULT_FILE"
+            echo -e "Тест хийгдэж байна: $payload" >> "$RESULT_FILE"
+            echo -e "Хариу: $response\n" >> "$RESULT_FILE"
             
             if [[ "$response" =~ "Exception" || "$response" =~ "stack trace" || "$response" =~ "at java." || "$response" =~ "at org.springframework" || "$response" =~ "internal server error" ]]; then
                 info_disclosure=$((info_disclosure + 1))
@@ -484,8 +484,8 @@ done
 wait
 
 # ================ TEST 6: CSRF PROTECTION ================
-echo -e "${BLUE}Testing CSRF Protection...${NC}"
-echo -e "\n## 6. CSRF PROTECTION\n" >> "$RESULT_FILE"
+echo -e "${BLUE}CSRF халдлагаас хамгаалалтыг шалгаж байна...${NC}"
+echo -e "\n## 6. CSRF ХАЛДЛАГААС ХАМГААЛАЛТ\n" >> "$RESULT_FILE"
 
 # tests in parallel
 for impl in "Golang:$GOLANG_PORT" "TypeScript:$TYPESCRIPT_PORT" "Java:$JAVA_PORT"; do
@@ -499,14 +499,14 @@ for impl in "Golang:$GOLANG_PORT" "TypeScript:$TYPESCRIPT_PORT" "Java:$JAVA_PORT
     headers_response=$(curl -s -I "http://localhost:$port/")
     if ! echo "$headers_response" | grep -qi "X-CSRF-Token"; then
         csrf_vulnerabilities=$((csrf_vulnerabilities + 1))
-        echo -e "❌ CSRF token header not found" >> "$RESULT_FILE"
+        echo -e "❌ CSRF токен header олдсонгүй" >> "$RESULT_FILE"
     fi
     
     # Test 2: Try to make a POST request w/o CSRF token
     response=$(make_request "http://localhost:$port/api/data" "POST" '{"data":"test"}')
     if [ $? -eq 0 ] && [[ "$response" =~ "success" ]]; then
         csrf_vulnerabilities=$((csrf_vulnerabilities + 1))
-        echo -e "❌ Request succeeded without CSRF token" >> "$RESULT_FILE"
+        echo -e "❌ CSRF токенгүйгээр хүсэлт амжилттай боллоо" >> "$RESULT_FILE"
     fi
     
     case $name in
@@ -517,8 +517,8 @@ for impl in "Golang:$GOLANG_PORT" "TypeScript:$TYPESCRIPT_PORT" "Java:$JAVA_PORT
 done
 
 # ================ TEST 7: RATE LIMITING ================
-echo -e "${BLUE}Testing Rate Limiting...${NC}"
-echo -e "\n## 7. RATE LIMITING\n" >> "$RESULT_FILE"
+echo -e "${BLUE}Хүсэлтийн хязгаарлалтыг шалгаж байна...${NC}"
+echo -e "\n## 7. ХҮСЭЛТИЙН ХЯЗГААРЛАЛТ\n" >> "$RESULT_FILE"
 
 # tests in parallel
 for impl in "Golang:$GOLANG_PORT" "TypeScript:$TYPESCRIPT_PORT" "Java:$JAVA_PORT"; do
@@ -540,9 +540,9 @@ for impl in "Golang:$GOLANG_PORT" "TypeScript:$TYPESCRIPT_PORT" "Java:$JAVA_PORT
     done
     
     if [ $rate_limit_vulnerabilities -eq 10 ]; then
-        echo -e "❌ No rate limiting detected" >> "$RESULT_FILE"
+        echo -e "❌ Хүсэлтийн хязгаарлалт илэрсэнгүй" >> "$RESULT_FILE"
     else
-        echo -e "✅ Rate limiting appears to be in place" >> "$RESULT_FILE"
+        echo -e "✅ Хүсэлтийн хязгаарлалт идэвхтэй байна" >> "$RESULT_FILE"
     fi
     
     case $name in
@@ -553,8 +553,8 @@ for impl in "Golang:$GOLANG_PORT" "TypeScript:$TYPESCRIPT_PORT" "Java:$JAVA_PORT
 done
 
 # ================ TEST 8: DEPENDENCY SECURITY ================
-echo -e "${BLUE}Testing Dependency Security...${NC}"
-echo -e "\n## 8. DEPENDENCY SECURITY\n" >> "$RESULT_FILE"
+echo -e "${BLUE}Хамаарлын сан аюулгүй байдлыг шалгаж байна...${NC}"
+echo -e "\n## 8. ХАМААРЛЫН САН АЮУЛГҮЙ БАЙДАЛ\n" >> "$RESULT_FILE"
 
 # tests in parallel
 for impl in "Golang:$GOLANG_PORT" "TypeScript:$TYPESCRIPT_PORT" "Java:$JAVA_PORT"; do
@@ -568,13 +568,13 @@ for impl in "Golang:$GOLANG_PORT" "TypeScript:$TYPESCRIPT_PORT" "Java:$JAVA_PORT
     headers_response=$(curl -s -I "http://localhost:$port/")
     if echo "$headers_response" | grep -qi "X-Powered-By"; then
         dependency_vulnerabilities=$((dependency_vulnerabilities + 1))
-        echo -e "❌ Server technology information exposed" >> "$RESULT_FILE"
+        echo -e "❌ Сервер технологийн мэдээлэл задарч байна" >> "$RESULT_FILE"
     fi
     
     # Check for outdated security headers
     if echo "$headers_response" | grep -qi "X-XSS-Protection: 0"; then
         dependency_vulnerabilities=$((dependency_vulnerabilities + 1))
-        echo -e "❌ Outdated security headers detected" >> "$RESULT_FILE"
+        echo -e "❌ Хуучирсан аюулгүй байдлын header-үүд илэрлээ" >> "$RESULT_FILE"
     fi
     
     case $name in
@@ -586,7 +586,8 @@ done
 
 # ================ ANALYSIS SUMMARY ================
 echo -e "${BLUE}Generating Analysis Summary...${NC}"
-echo -e "\n## 9. ANALYSIS SUMMARY\n" >> "$RESULT_FILE"
+echo -e "\n## ДҮН ШИНЖИЛГЭЭНИЙ ХУРААНГУЙ\n" >> "$RESULT_FILE"
+echo -e "### ЧУХАЛ АЮУЛГҮЙ БАЙДЛЫН ТЕСТИЙН ҮР ДҮН\n" >> "$RESULT_FILE"
 
 # security status
 get_security_status() {
@@ -607,70 +608,70 @@ get_notes() {
   case $test in
     "input_validation")
       if [ $failures -eq 0 ]; then
-        echo "Strong validation framework"
+        echo "Хүчтэй баталгаажуулалтын систем"
       elif [ $failures -le 2 ]; then
-        echo "Basic validation present"
+        echo "Энгийн баталгаажуулалт байгаа"
       else
-        echo "Manual validation required"
+        echo "Гар аргаар баталгаажуулах шаардлагатай"
       fi
       ;;
     "sql_injection")
       if [ $failures -eq 0 ]; then
-        echo "All SQL injection attempts blocked"
+        echo "Бүх SQL injection халдлагыг блоклосон"
       else
-        echo "Vulnerable to SQL injection"
+        echo "SQL injection-д өртөмтгий"
       fi
       ;;
     "jwt_security")
       if [ $failures -eq 0 ]; then
-        echo "Proper token validation"
+        echo "Зөв токен баталгаажуулалт"
       else
-        echo "Invalid tokens accepted"
+        echo "Буруу токенийг хүлээн авсан"
       fi
       ;;
     "security_headers")
       if [ $failures -eq 0 ]; then
-        echo "All security headers present"
+        echo "Бүх аюулгүй байдлын header-үүд байгаа"
       elif [ $failures -le 2 ]; then
-        echo "Most security headers present"
+        echo "Ихэнх аюулгүй байдлын header-үүд байгаа"
       else
-        echo "Missing critical security headers"
+        echo "Чухал аюулгүй байдлын header-үүд байхгүй"
       fi
       ;;
     "error_handling")
       if [ $failures -eq 0 ]; then
-        echo "Secure error handling"
+        echo "Аюулгүй алдааны боловсруулалт"
       else
-        echo "Information disclosure in errors"
+        echo "Алдааны мэдээлэл задарсан"
       fi
       ;;
     "csrf_protection")
       if [ $failures -eq 0 ]; then
-        echo "CSRF protection in place"
+        echo "CSRF хамгаалалт идэвхтэй"
       else
-        echo "CSRF vulnerabilities detected"
+        echo "CSRF халдлагад өртөмтгий"
       fi
       ;;
     "rate_limiting")
       if [ $failures -eq 0 ]; then
-        echo "Rate limiting implemented"
+        echo "Хүсэлтийн хязгаарлалт хийгдсэн"
       else
-        echo "Rate limiting not implemented"
+        echo "Хүсэлтийн хязгаарлалт байхгүй"
       fi
       ;;
     "dependency_security")
       if [ $failures -eq 0 ]; then
-        echo "No known vulnerabilities"
+        echo "Мэдэгдсэн эмзэг байдал байхгүй"
       else
-        echo "Vulnerabilities detected"
+        echo "Эмзэг байдал илэрсэн"
       fi
       ;;
   esac
 }
 
 echo -e "### 9.1 Critical Security Test Results\n" >> "$RESULT_FILE"
-echo -e "| Security Test | Golang | TypeScript | Java | Notes |" >> "$RESULT_FILE"
-echo -e "|--------------|--------|------------|------|-------|" >> "$RESULT_FILE"
+echo -e "| Аюулгүй байдлын тест | Golang | TypeScript | Java | Тайлбар |" >> "$RESULT_FILE"
+echo -e "|----------------------|---------|------------|------|----------|" >> "$RESULT_FILE"
 
 # Generate table rows based on actual test results
 test_names=("input_validation" "sql_injection" "jwt_security" "security_headers" "error_handling" "csrf_protection" "rate_limiting" "dependency_security")
@@ -684,80 +685,87 @@ for i in "${!test_names[@]}"; do
   echo -e "| $test | $golang_status | $typescript_status | $java_status | $notes |" >> "$RESULT_FILE"
 done
 
-echo -e "\nLegend: ✅ Secure   ⚠️ Partially Secure   ❌ Vulnerable\n" >> "$RESULT_FILE"
+echo -e "\nТайлбар: ✅ Аюулгүй   ⚠️ Хэсэгчлэн аюулгүй   ❌ Эмзэг\n" >> "$RESULT_FILE"
 
-echo -e "### 9.2 Key Findings\n" >> "$RESULT_FILE"
+echo -e "### ГОЛ ОЛДВОРУУД\n" >> "$RESULT_FILE"
 
-# Generate findings based on actual test results
-echo -e "1. **Input Validation:**" >> "$RESULT_FILE"
+# 1. Input Validation
+echo -e "1. **Оролтын өгөгдлийн баталгаажуулалт:**" >> "$RESULT_FILE"
 if [ "${golang_results[0]}" -gt 2 ]; then
-  echo -e "   - Golang requires manual validation implementation" >> "$RESULT_FILE"
+  echo -e "   - Golang гар аргаар баталгаажуулалт хийх шаардлагатай" >> "$RESULT_FILE"
 fi
 if [ "${typescript_results[0]}" -eq 0 ]; then
-  echo -e "   - TypeScript shows strong validation framework" >> "$RESULT_FILE"
+  echo -e "   - TypeScript хүчтэй баталгаажуулалтын системтэй" >> "$RESULT_FILE"
 fi
 if [ "${java_results[0]}" -eq 0 ]; then
-  echo -e "   - Java demonstrates robust validation" >> "$RESULT_FILE"
+  echo -e "   - Java найдвартай баталгаажуулалт үзүүлж байна" >> "$RESULT_FILE"
 fi
 echo -e "" >> "$RESULT_FILE"
 
-echo -e "2. **SQL Injection Protection:**" >> "$RESULT_FILE"
+# 2. SQL Injection Protection
+echo -e "2. **SQL Injection халдлагаас хамгаалалт:**" >> "$RESULT_FILE"
 if [ "${golang_results[1]}" -eq 0 ] && [ "${typescript_results[1]}" -eq 0 ] && [ "${java_results[1]}" -eq 0 ]; then
-  echo -e "   - All implementations successfully block SQL injection attempts" >> "$RESULT_FILE"
+  echo -e "   - Бүх хэрэгжүүлэлт SQL injection халдлагыг амжилттай блоклож байна" >> "$RESULT_FILE"
 else
-  echo -e "   - Some implementations are vulnerable to SQL injection" >> "$RESULT_FILE"
+  echo -e "   - Зарим хэрэгжүүлэлт SQL injection халдлагад өртөмтгий байна" >> "$RESULT_FILE"
 fi
 echo -e "" >> "$RESULT_FILE"
 
-echo -e "3. **JWT Security:**" >> "$RESULT_FILE"
+# 3. JWT Security
+echo -e "3. **JWT токен аюулгүй байдал:**" >> "$RESULT_FILE"
 if [ "${golang_results[2]}" -eq 0 ] && [ "${typescript_results[2]}" -eq 0 ] && [ "${java_results[2]}" -eq 0 ]; then
-  echo -e "   - All implementations properly validate JWT tokens" >> "$RESULT_FILE"
+  echo -e "   - Бүх хэрэгжүүлэлт JWT токенийг зөв баталгаажуулж байна" >> "$RESULT_FILE"
 else
-  echo -e "   - Some implementations accept invalid tokens" >> "$RESULT_FILE"
+  echo -e "   - Зарим хэрэгжүүлэлт буруу токенийг хүлээн авч байна" >> "$RESULT_FILE"
 fi
 echo -e "" >> "$RESULT_FILE"
 
-echo -e "4. **Security Headers:**" >> "$RESULT_FILE"
+# 4. Security Headers
+echo -e "4. **Аюулгүй байдлын header-үүд:**" >> "$RESULT_FILE"
 if [ "${golang_results[3]}" -gt 2 ]; then
-  echo -e "   - Golang needs manual header implementation" >> "$RESULT_FILE"
+  echo -e "   - Golang-д header-үүдийг гараар тохируулах шаардлагатай" >> "$RESULT_FILE"
 fi
 if [ "${typescript_results[3]}" -le 2 ]; then
-  echo -e "   - TypeScript has most security headers configured" >> "$RESULT_FILE"
+  echo -e "   - TypeScript ихэнх аюулгүй байдлын header-үүдийг тохируулсан" >> "$RESULT_FILE"
 fi
 if [ "${java_results[3]}" -eq 0 ]; then
-  echo -e "   - Java provides comprehensive security headers" >> "$RESULT_FILE"
+  echo -e "   - Java иж бүрэн аюулгүй байдлын header-үүдтэй" >> "$RESULT_FILE"
 fi
 echo -e "" >> "$RESULT_FILE"
 
-echo -e "5. **Error Handling:**" >> "$RESULT_FILE"
+# 5. Error Handling
+echo -e "5. **Алдааны боловсруулалт:**" >> "$RESULT_FILE"
 if [ "${golang_results[4]}" -eq 0 ] && [ "${typescript_results[4]}" -eq 0 ] && [ "${java_results[4]}" -eq 0 ]; then
-  echo -e "   - All implementations handle errors securely" >> "$RESULT_FILE"
+  echo -e "   - Бүх хэрэгжүүлэлт алдааг аюулгүй боловсруулж байна" >> "$RESULT_FILE"
 else
-  echo -e "   - Some implementations disclose sensitive information in errors" >> "$RESULT_FILE"
+  echo -e "   - Зарим хэрэгжүүлэлт алдааны мэдээллийг задруулж байна" >> "$RESULT_FILE"
 fi
 echo -e "" >> "$RESULT_FILE"
 
-echo -e "6. **CSRF Protection:**" >> "$RESULT_FILE"
+# 6. CSRF Protection
+echo -e "6. **CSRF халдлагаас хамгаалалт:**" >> "$RESULT_FILE"
 if [ "${golang_results[5]}" -eq 0 ] && [ "${typescript_results[5]}" -eq 0 ] && [ "${java_results[5]}" -eq 0 ]; then
-  echo -e "   - All implementations protect against CSRF attacks" >> "$RESULT_FILE"
+  echo -e "   - Бүх хэрэгжүүлэлт CSRF халдлагаас хамгаалагдсан" >> "$RESULT_FILE"
 else
-  echo -e "   - Some implementations are vulnerable to CSRF attacks" >> "$RESULT_FILE"
+  echo -e "   - Зарим хэрэгжүүлэлт CSRF халдлагад өртөмтгий" >> "$RESULT_FILE"
 fi
 echo -e "" >> "$RESULT_FILE"
 
-echo -e "7. **Rate Limiting:**" >> "$RESULT_FILE"
+# 7. Rate Limiting
+echo -e "7. **Хүсэлтийн хязгаарлалт:**" >> "$RESULT_FILE"
 if [ "${golang_results[6]}" -eq 0 ] && [ "${typescript_results[6]}" -eq 0 ] && [ "${java_results[6]}" -eq 0 ]; then
-  echo -e "   - All implementations implement rate limiting" >> "$RESULT_FILE"
+  echo -e "   - Бүх хэрэгжүүлэлт хүсэлтийн хязгаарлалт хийсэн" >> "$RESULT_FILE"
 else
-  echo -e "   - Some implementations do not implement rate limiting" >> "$RESULT_FILE"
+  echo -e "   - Зарим хэрэгжүүлэлт хүсэлтийн хязгаарлалт хийгээгүй" >> "$RESULT_FILE"
 fi
 echo -e "" >> "$RESULT_FILE"
 
-echo -e "8. **Dependency Security:**" >> "$RESULT_FILE"
+# 8. Dependency Security
+echo -e "8. **Хамаарлын сан аюулгүй байдал:**" >> "$RESULT_FILE"
 if [ "${golang_results[7]}" -eq 0 ] && [ "${typescript_results[7]}" -eq 0 ] && [ "${java_results[7]}" -eq 0 ]; then
-  echo -e "   - All implementations are secure against known vulnerabilities" >> "$RESULT_FILE"
+  echo -e "   - Бүх хэрэгжүүлэлт мэдэгдсэн эмзэг байдлаас хамгаалагдсан" >> "$RESULT_FILE"
 else
-  echo -e "   - Some implementations are vulnerable to known vulnerabilities" >> "$RESULT_FILE"
+  echo -e "   - Зарим хэрэгжүүлэлт мэдэгдсэн эмзэг байдалтай" >> "$RESULT_FILE"
 fi
 echo -e "" >> "$RESULT_FILE"
 
@@ -852,4 +860,4 @@ cat << EOF > visualization_data.json
 }
 EOF
 
-echo -e "${GREEN}Security test complete! Results saved to $RESULT_FILE${NC}"
+echo -e "${GREEN}Аюулгүй байдлын тест дууслаа! Үр дүн $RESULT_FILE файлд хадгалагдлаа${NC}"
