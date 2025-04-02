@@ -7,14 +7,14 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-# Default port configuration with environment variable support
+# Default port 
 GOLANG_PORT=${GOLANG_PORT:-8080}
 TYPESCRIPT_PORT=${TYPESCRIPT_PORT:-3000}
 JAVA_PORT=${JAVA_PORT:-8081}
 
-# Create timestamp for test results
+# Create log file
 TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
-RESULT_FILE="language_security_comparison_${TIMESTAMP}.log"
+RESULT_FILE="language_security_comparison_${TIMESTAMP}.txt"
 
 # Test results
 declare -A results
@@ -30,7 +30,7 @@ check_service() {
     return 0
 }
 
-# Function to make HTTP requests with proper error handling
+# error handling
 make_request() {
     local url=$1
     local method=${2:-GET}
@@ -64,12 +64,11 @@ make_request() {
     return 0
 }
 
-# Function to print section headers
 print_section() {
     echo -e "\n${YELLOW}=== $1 ===${NC}"
 }
 
-# Function to test endpoint
+# test endpoint
 test_endpoint() {
     local url=$1
     local method=${2:-GET}
@@ -83,7 +82,7 @@ test_endpoint() {
     fi
 }
 
-# Function to check security headers
+# check security headers
 check_security_headers() {
     local url=$1
     local service=$2
@@ -125,7 +124,7 @@ check_security_headers() {
     echo "$score"
 }
 
-# Function to test SQL injection protection
+# test SQL injection protection
 test_sql_injection() {
     local service=$1
     local base_url=$2
@@ -153,7 +152,7 @@ test_sql_injection() {
     echo "$score"
 }
 
-# Function to test JWT token security
+# Ftest JWT token security
 test_jwt_security() {
     local service=$1
     local base_url=$2
@@ -184,7 +183,7 @@ test_jwt_security() {
     echo "$score"
 }
 
-# Function to test rate limiting
+# test rate limiting
 test_rate_limiting() {
     local service=$1
     local base_url=$2
@@ -208,7 +207,7 @@ test_rate_limiting() {
     echo "$score"
 }
 
-# Function to measure response time
+# measure response time
 measure_response_time() {
     local url=$1
     local iterations=${2:-10}
@@ -223,11 +222,11 @@ measure_response_time() {
         sleep 0.1
     done
     
-    # Convert nanoseconds to milliseconds with proper decimal handling
+    # Convert nanoseconds to milliseconds
     echo "scale=2; $total_time / ($iterations * 1000000)" | bc -l
 }
 
-# Initialize arrays to store test results
+# arrays to store test results
 golang_results=()
 typescript_results=()
 java_results=()
@@ -272,7 +271,7 @@ done
 echo -e "${BLUE}Testing Input Validation Mechanisms...${NC}"
 echo -e "\n## 1. INPUT VALIDATION MECHANISMS\n" >> "$RESULT_FILE"
 
-# Test payloads for input validation
+# input validation
 input_payloads=(
   '{"username":"admin","password":"short"}'
   '{"username":"","password":""}'
@@ -282,7 +281,7 @@ input_payloads=(
   '{"username":"admin","password":"password123","xss":"<script>alert(1)</script>"}'
 )
 
-# Run input validation tests in parallel
+# tests in parallel
 for impl in "Golang:$GOLANG_PORT" "TypeScript:$TYPESCRIPT_PORT" "Java:$JAVA_PORT"; do
     IFS=":" read -r name port <<< "$impl"
     
@@ -316,7 +315,7 @@ wait
 echo -e "${BLUE}Testing SQL Injection Protection...${NC}"
 echo -e "\n## 2. SQL INJECTION PROTECTION\n" >> "$RESULT_FILE"
 
-# Enhanced SQL injection payloads
+# SQL injection payloads
 sqli_payloads=(
   "{\"username\":\"user' OR '1'='1\",\"password\":\"password123\"}"
   "{\"username\":\"user'; DROP TABLE users; --\",\"password\":\"password123\"}"
@@ -325,7 +324,7 @@ sqli_payloads=(
   "{\"username\":\"admin' AND 1=CONVERT(int,(SELECT @@version))--\",\"password\":\"password123\"}"
 )
 
-# Run SQL injection tests in parallel
+# tests in parallel
 for impl in "Golang:$GOLANG_PORT" "TypeScript:$TYPESCRIPT_PORT" "Java:$JAVA_PORT"; do
     IFS=":" read -r name port <<< "$impl"
     
@@ -365,7 +364,7 @@ jwt_payloads=(
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjE1MTYyMzkwMjJ9.4Adcj3UFYzPUVaVF43FmMze0xwYzQ6N8qB3kqgXh7w"
 )
 
-# Run JWT security tests in parallel
+# tests in parallel
 for impl in "Golang:$GOLANG_PORT" "TypeScript:$TYPESCRIPT_PORT" "Java:$JAVA_PORT"; do
     IFS=":" read -r name port <<< "$impl"
     
@@ -411,7 +410,7 @@ security_headers=(
   "Cross-Origin-Resource-Policy"
 )
 
-# Run security headers tests in parallel
+# tests in parallel
 for impl in "Golang:$GOLANG_PORT" "TypeScript:$TYPESCRIPT_PORT" "Java:$JAVA_PORT"; do
     IFS=":" read -r name port <<< "$impl"
     
@@ -455,7 +454,7 @@ error_payloads=(
   '{"username":"test_user","password":"test_password","xss":"<script>alert(1)</script>"}'
 )
 
-# Run error handling tests in parallel
+# tests in parallel
 for impl in "Golang:$GOLANG_PORT" "TypeScript:$TYPESCRIPT_PORT" "Java:$JAVA_PORT"; do
     IFS=":" read -r name port <<< "$impl"
     
@@ -488,7 +487,7 @@ wait
 echo -e "${BLUE}Testing CSRF Protection...${NC}"
 echo -e "\n## 6. CSRF PROTECTION\n" >> "$RESULT_FILE"
 
-# Run CSRF protection tests in parallel
+# tests in parallel
 for impl in "Golang:$GOLANG_PORT" "TypeScript:$TYPESCRIPT_PORT" "Java:$JAVA_PORT"; do
     IFS=":" read -r name port <<< "$impl"
     
@@ -503,7 +502,7 @@ for impl in "Golang:$GOLANG_PORT" "TypeScript:$TYPESCRIPT_PORT" "Java:$JAVA_PORT
         echo -e "❌ CSRF token header not found" >> "$RESULT_FILE"
     fi
     
-    # Test 2: Try to make a POST request without CSRF token
+    # Test 2: Try to make a POST request w/o CSRF token
     response=$(make_request "http://localhost:$port/api/data" "POST" '{"data":"test"}')
     if [ $? -eq 0 ] && [[ "$response" =~ "success" ]]; then
         csrf_vulnerabilities=$((csrf_vulnerabilities + 1))
@@ -521,7 +520,7 @@ done
 echo -e "${BLUE}Testing Rate Limiting...${NC}"
 echo -e "\n## 7. RATE LIMITING\n" >> "$RESULT_FILE"
 
-# Run rate limiting tests in parallel
+# tests in parallel
 for impl in "Golang:$GOLANG_PORT" "TypeScript:$TYPESCRIPT_PORT" "Java:$JAVA_PORT"; do
     IFS=":" read -r name port <<< "$impl"
     
@@ -557,7 +556,7 @@ done
 echo -e "${BLUE}Testing Dependency Security...${NC}"
 echo -e "\n## 8. DEPENDENCY SECURITY\n" >> "$RESULT_FILE"
 
-# Run dependency security tests in parallel
+# tests in parallel
 for impl in "Golang:$GOLANG_PORT" "TypeScript:$TYPESCRIPT_PORT" "Java:$JAVA_PORT"; do
     IFS=":" read -r name port <<< "$impl"
     
@@ -589,7 +588,7 @@ done
 echo -e "${BLUE}Generating Analysis Summary...${NC}"
 echo -e "\n## 9. ANALYSIS SUMMARY\n" >> "$RESULT_FILE"
 
-# Function to determine security status
+# security status
 get_security_status() {
   local failures=$1
   if [ $failures -eq 0 ]; then
@@ -601,7 +600,7 @@ get_security_status() {
   fi
 }
 
-# Function to get notes based on test results
+# notes based on test results
 get_notes() {
   local test=$1
   local failures=$2
